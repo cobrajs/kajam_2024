@@ -55,6 +55,15 @@ loadSprite('sheet', 'sprites/sheet.png', {
 		laser: { from: 82, to: 83, loop: true, speed: 8 }
 	},
 })
+loadSprite('earth', 'sprites/earth.png')
+loadSprite('title', 'sprites/title.png')
+
+loadSound('shot', 'sounds/shot.wav')
+loadSound('shot2', 'sounds/shot2.wav')
+loadSound('laser', 'sounds/laser.wav')
+loadSound('explosion', 'sounds/explosion.wav')
+
+loadMusic('dnbspace', 'music/dnb space.ogg')
 
 gameScene()
 menuScene()

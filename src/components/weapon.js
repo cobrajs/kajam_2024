@@ -32,7 +32,7 @@ function addBullet({ position, direction, speed = 200, power = 2, fromInfo }) {
 		move(direction, speed),
 		anchor('center'),
 		sprite('sheet', { frame: power === 2 ? 80 : 83 }),
-		offscreen({ destroy: true }),
+		offscreen({ destroy: true, distance: 10 }),
 		layer('bullets'),
 		rotate(direction.angle() + 90),
 		area({ shape: new Rect(vec2(0), 8, 8) }),
@@ -43,12 +43,18 @@ function addBullet({ position, direction, speed = 200, power = 2, fromInfo }) {
 		'bullet'
 	])
 
+	play(power === 1 ? 'shot' : 'shot2', { detune: randi(-10, 10) * 20, volume: rand(0.7, 0.9) }) 
+
 	bullet.onCollide('bullet', (otherBullet) => {
 		if (otherBullet.from.tag !== bullet.from.tag) {
 			otherBullet.destroy()
 			bullet.destroy()
 			if (bullet.from.tag === 'player') {
 				addExplosion(bullet.pos.add(otherBullet.pos).scale(0.5))
+				const player = get('player').pop()
+				if (player) {
+					player.score(50)
+				}
 			}
 		}
 	})
@@ -68,18 +74,27 @@ function addLaser({ position, direction, fromInfo }) {
 		anchor('center'),
 		rect(8, useHeight),
 		color(255, 255, 255),
-		lifespan(0.1, { fade: 0.1 }),
+		lifespan(0.08, { fade: 0.08 }),
 		opacity(1),
 		layer('bullets'),
 		area(),
-		{ from: fromInfo },
+		{ 
+			from: fromInfo,
+			power: 2,
+		},
 		'laser'
 	])
+
+	play('laser', { detune: randi(-10, 10) * 5, volume: rand(0.7, 0.9) }) 
 
 	bullet.onCollide('bullet', (otherBullet) => {
 		if (otherBullet.from.tag !== bullet.from.tag) {
 			otherBullet.destroy()
 			addExplosion(otherBullet.pos)
+			const player = get('player').pop()
+			if (player) {
+				player.score(50)
+			}
 		}
 	})
 }
@@ -89,13 +104,13 @@ function addMissile({ position, direction, target, speed = 100, fromInfo }) {
 		pos(position),
 		anchor('center'),
 		sprite('sheet', { frame: 81 }),
-		offscreen({ destroy: true }),
+		offscreen({ destroy: true, distance: 10 }),
 		layer('bullets'),
 		rotate(direction.angle() + 90),
 		area({ shape: new Rect(vec2(0), 8, 8) }),
 		{
 			from: fromInfo,
-			target
+			target,
 		},
 		'bullet'
 	])
@@ -124,6 +139,13 @@ function addMissile({ position, direction, target, speed = 100, fromInfo }) {
 			bullet.destroy()
 			if (bullet.from.tag === 'player') {
 				addExplosion(bullet.pos.add(otherBullet.pos).scale(0.5))
+			}
+
+			if (otherBullet.from.tag === 'player') {
+				const player = get('player').pop()
+				if (player) {
+					player.score(100)
+				}
 			}
 		}
 	})
@@ -190,10 +212,14 @@ export function weapon(type) {
 					firePower = 4
 					break
 				case MISSILE:
-					const targets = get('enemy')
 					let target = null
-					if (targets.length) {
-						target = targets[Math.floor(Math.random() * targets.length)]
+					if (this.is('player')) {
+						const targets = get('enemy')
+						if (targets.length) {
+							target = choose(targets)
+						}
+					} else if (this.is('enemy')) {
+						target = get('player').pop()
 					}
 					addMissile({ position: this.pos, direction: firingDirection, target, fromInfo })
 					break

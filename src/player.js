@@ -9,6 +9,7 @@ import { displayUpgrades } from './components/displayUpgrades'
 import { blink } from './components/blink'
 import { state } from './components/state'
 import { lives } from './components/lives'
+import { score } from './components/score'
 
 import { addBigExplosion } from './explosion'
 
@@ -24,9 +25,7 @@ export default function addPlayer({ startPos, lifeCount }) {
 		pos(startPos),
 		sprite('sheet', { frame: 17 }),
 		anchor('center'),
-		//weapon(Math.random() > 0.5 ? SINGLE : DOUBLE),
-		//weapon(PEA_SHOOTER),
-		weapon(MISSILE),
+		weapon(PEA_SHOOTER),
 		layer('player'),
 		opacity(1),
 		blink(),
@@ -35,6 +34,7 @@ export default function addPlayer({ startPos, lifeCount }) {
 		spaceFlight({ maxSpeed: PLAYER_SPEED }),
 		lives(lifeCount),
 		area({ shape: new Rect(vec2(0), 18, 18) }),
+		score(0),
 		'player',
 		{
 			firingDirection: Vec2.UP,
@@ -102,6 +102,23 @@ export default function addPlayer({ startPos, lifeCount }) {
 		player.changeWeapon(weaponType)
 		player.updateWeaponType(weaponType)
 		bullet.destroy()
+
+		player.kill()
+		player.changeState('dead')
+	})
+
+	player.onCollide('laser', (laser) => {
+		if (player.isInvincible) {
+			return
+		}
+
+		const { type: weaponType, tag } = laser.from
+		if (tag !== 'enemy') {
+			return
+		}
+
+		player.changeWeapon(weaponType)
+		player.updateWeaponType(weaponType)
 
 		player.kill()
 		player.changeState('dead')

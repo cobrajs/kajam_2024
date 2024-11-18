@@ -21,5 +21,7 @@ export function addExplosion(position) {
 		opacity(1),
 		lifespan(0.5, { fade: 0.2 })
 	])
+
+	play('explosion', { detune: randi(-10, 10) * 5, volume: rand(0.8, 1.0) })
 }
 

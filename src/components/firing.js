@@ -24,12 +24,12 @@ export function firing({ style = STRAIGHT, interval = 0.5 }) {
 			this.firingTimer = interval
 		},
 		update() {
-			if ((style ===OVER_TARGET || style === TARGET_LOCK) && !target) {
+			if ((style === OVER_TARGET || style === TARGET_LOCK) && !target) {
 				setTarget()
 			}
 			if (style === OVER_TARGET && target) {
 				if (Math.abs(target.pos.x - this.pos.x) < 5) {
-					doFire(this)
+					wait(0.1, () => doFire(this))
 				}
 			} else if (style === STRAIGHT || style === TARGET_LOCK) {
 				this.firingTimer -= dt()

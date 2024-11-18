@@ -31,9 +31,10 @@ export const enemyTypes = [{
 	weaponType: SINGLE,
 	speed: 150,
 	firingStyle: {
-		interval: 0.8,
+		interval: 1.2,
 		style: STRAIGHT,
-	}
+	},
+	points: 200
 }, {
 	name: BASIC_FAST_ENEMY,
 	frame: 38,
@@ -43,7 +44,8 @@ export const enemyTypes = [{
 	firingStyle: {
 		interval: 1,
 		style: OVER_TARGET,
-	}
+	},
+	points: 300
 }, {
 	name: DOUBLER_ENEMY,
 	frame: 40,
@@ -53,7 +55,8 @@ export const enemyTypes = [{
 	firingStyle: {
 		interval: 1,
 		style: STRAIGHT,
-	}
+	},
+	points: 400
 }, {
 	name: SPREADER_ENEMY,
 	frame: 52,
@@ -63,7 +66,8 @@ export const enemyTypes = [{
 	firingStyle: {
 		interval: 1,
 		style: STRAIGHT,
-	}
+	},
+	points: 600
 }, {
 	name: PEWPEW_ENEMY,
 	frame: 42,
@@ -73,7 +77,8 @@ export const enemyTypes = [{
 	firingStyle: {
 		interval: 1,
 		style: OVER_TARGET,
-	}
+	},
+	points: 600
 }, {
 	name: LAUNCHY_ENEMY,
 	frame: 54,
@@ -81,9 +86,10 @@ export const enemyTypes = [{
 	weaponType: MISSILE,
 	speed: 200,
 	firingStyle: {
-		interval: 1,
+		interval: 1.5,
 		style: STRAIGHT,
-	}
+	},
+	points: 800
 }, {
 	name: BADBOY_ENEMY,
 	frame: 36,
@@ -92,9 +98,10 @@ export const enemyTypes = [{
 	//shipUpgradeType: SHIELD,
 	speed: 200,
 	firingStyle: {
-		interval: 0.5,
+		interval: 1,
 		style: TARGET_LOCK,
-	}
+	},
+	points: 2000
 }]
 
 export function getEnemyByName(name) {
@@ -108,7 +115,8 @@ export default function addEnemy({
 	speed = ENEMY_SPEED,
 	weaponType = SINGLE,
 	firingStyle = { style: STRAIGHT, interval: 1 },
-	script = null
+	script = null,
+	points = 200
 } = {}) {
 
 	if (!startPos) {
@@ -130,7 +138,8 @@ export default function addEnemy({
 			firingDirection: Vec2.DOWN,
 			moveStyle: SIDE_TO_SIDE,
 			target: null,
-			hurtFrame
+			hurtFrame,
+			points
 		}
 	])
 
@@ -178,10 +187,25 @@ export default function addEnemy({
 		enemy.frame = enemy.hurtFrame
 	})
 
+	enemy.onCollide('laser', (laser) => {
+		const { type: weaponType, tag } = laser.from
+		if (tag !== 'player') {
+			return
+		}
+
+		enemy.hurt(laser.power)
+
+		enemy.frame = enemy.hurtFrame
+	})
+
 	enemy.onDeath(() => {
-		console.log('Oh shoot im dead')
 		addBigExplosion(enemy.pos, 10)
 		enemy.destroy()
+
+		const player = get('player').pop()
+		if (player) {
+			player.score(enemy.points)
+		}
 	})
 
 	return enemy

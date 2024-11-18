@@ -1,8 +1,3 @@
-import 'kaplay/global'
-
-import { weapon, SINGLE, DOUBLE, WAVE } from './components/weapon'
-import { spaceFlight } from './components/spaceFlight'
-import { firing, STRAIGHT, TARGET_LOCK } from './components/firing'
 import { addExplosion } from './explosion'
 
 const ROCK_SPEED = 100
@@ -30,11 +25,18 @@ export default function addRock({ startPos, direction = Vec2.DOWN, size = BIG })
 
 	wait(0.2, () => rock.isInvincible = false)
 
-	const collider = () => {
+	const collider = (other) => {
 		if (rock.isInvincible) {
 			return false
 		}
 		rock.hurt()
+
+		if (other.from && other.from.tag === 'player') {
+			const player = get('player').pop()
+			if (player) {
+				player.score(50)
+			}
+		}
 		return true
 	}
 

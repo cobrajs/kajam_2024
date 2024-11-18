@@ -1,12 +1,12 @@
 function addStar({ parent, top = false, position, size, rotation }) {
 	if (!size) {
-		size = Math.floor(Math.random() * 3)
+		size = randi(3)
 	}
 	if (!position) {
-		position = vec2(Math.round(Math.random() * width()), top ? Math.round(Math.random() * -20) : Math.round(Math.random() * height()))
+		position = vec2(randi(width()), top ? randi(-20, 0) : randi(height()))
 	}
 	if (!rotation) {
-		rotation = Math.round(Math.random() * 360)
+		rotation = randi(360)
 	}
 	parent.add([
 		pos(position),

@@ -5,7 +5,7 @@ import { card, WEAPON } from './components/card'
 import { numbers } from './components/numbers'
 
 export default function addUI() {
-	add([
+	const score = add([
 		pos(width() / 2 - 42, 6),
 		numbers({ numbers: 0, size: 1, padding: 5 }),
 		layer('ui'),
@@ -34,9 +34,5 @@ export default function addUI() {
 		'upgrades',
 		'ui'
 	])
-
-
-	// TODO: Add score display here
-
 }
 
